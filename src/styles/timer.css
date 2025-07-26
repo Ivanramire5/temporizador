@@ -1,0 +1,118 @@
+body {
+    background-color: #222831;
+    margin: 0 30px;
+}
+
+.pageDiv {
+    text-align: center;
+}
+
+.h1Join {
+    background-color: #393E46;
+    padding: 30px 0;
+    margin-top: -10px;
+    font-size: 3rem;
+    color: #FFD369;
+}
+
+.inputJoin,
+.inputTimer {
+    background-color: #EEEEEE;
+    width: 100%;
+    max-width: 600px;
+    height: 40px;
+    text-align: center;
+    margin-bottom: 40px;
+    color: black;
+    font-size: larger;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.formJoin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 70px;
+}
+
+.buttonJoin {
+    margin-top: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background-color: #FFD369;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.buttonJoin:hover {
+    transform: scale(1.1);
+}
+
+.h1Timer {
+    color: #FFD369;
+    font-size: 5rem;
+    margin-top: 40px;
+}
+
+.buttonTimer {
+    background-color: #FFD369;
+    color: black;
+    width: 200px;
+    height: 40px;
+    font-size: large;
+    border: none;
+    border-bottom: 5px solid #393E46;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    font-weight: bold;
+}
+
+.buttonTimer:hover {
+    transform: scale(1.1);
+}
+
+.pTimer {
+    color: #FFD369;
+    font-size: 3rem;
+}
+
+/* 🌐 Media Query para pantallas menores a 768px (móviles y tablets) */
+@media screen and (max-width: 768px) {
+    .h1Join {
+        font-size: 2rem;
+    }
+
+    .h1Timer {
+        font-size: 3rem;
+    }
+
+    .inputJoin,
+    .inputTimer {
+        max-width: 90%;
+        height: 35px;
+        font-size: medium;
+    }
+
+    .pTimer {
+        font-size: 2rem;
+    }
+
+    .buttonTimer {
+        width: 90%;
+        max-width: 250px;
+        height: 35px;
+    }
+
+    .buttonJoin {
+        width: 40px;
+        height: 40px;
+    }
+}
