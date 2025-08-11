@@ -9,8 +9,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<JoinScreen />} />
-        <Route path="/home/:codigo" element={<HomeScreen />} /> {/* Cambiado de sala a codigo */}
-        <Route path="/alarm/:codigo" element={<AlarmScreen />} /> {/* Corregido de //sala */}
+        <Route path="/home/:codigo" element={<HomeScreen />} /> { }
+        <Route path="/alarm/:codigo" element={<AlarmScreen />} /> { }
       </Routes>
     </BrowserRouter>
   );

@@ -22,7 +22,7 @@ const app = initializeApp(firebaseConfig);
 // Inicializamos los servicios
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
-const rtdb = getDatabase(app); // <-- acá está la RTDB
+const rtdb = getDatabase(app); 
 
 // Exportamos lo necesario
 export { app, db, rtdb };
