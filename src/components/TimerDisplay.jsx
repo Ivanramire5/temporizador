@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 import { ref, set, onValue } from "firebase/database";
 import { rtdb } from "../firebase/config";
 import { useParams } from "react-router-dom";
@@ -25,7 +26,7 @@ export default function TimerDisplay() {
         return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
     };
 
-    // Listener de Firebase
+    
     useEffect(() => {
         if (!sala) return;
 
@@ -102,124 +103,112 @@ export default function TimerDisplay() {
 
     
     const playAlarm = () => {
-    console.log('🚨 Iniciando alarma con loop protegido');
-    
-    let beepIntervalId = null;
-    let isActive = true;
-    let beepCount = 0;
-    let alarmStarted = false; // Nueva bandera para proteger
-    
-    const createBeepWithNewContext = () => {
-        if (!isActive) {
-            console.log(' Intento de beep cancelado - isActive es false');
-            return;
-        }
-        
-        beepCount++;
-        console.log(` Creando beep #${beepCount}`);
-        
-        try {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
+        console.log('Iniciando alarma con loop protegido');
+
+        let beepIntervalId = null;
+        let isActive = true;
+        let beepCount = 0;
+        let alarmStarted = false;
+
+        const createBeepWithNewContext = () => {
+            if (!isActive) {
+                console.log('Intento de beep cancelado - isActive es false');
+                return;
             }
-            
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = 800;
-            oscillator.type = 'square';
-            
-            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.1);
-            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.6);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.6);
-            
-            console.log(` Beep #${beepCount} reproducido correctamente`);
-            
-            setTimeout(() => {
-                if (audioContext.state !== 'closed') {
-                    audioContext.close();
+
+            beepCount++;
+            console.log(` Creando beep #${beepCount}`);
+
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
                 }
-            }, 700);
-            
-        } catch (error) {
-            console.error(` Error en beep #${beepCount}:`, error);
-        }
-    };
-    
-    
-    createBeepWithNewContext();
-    
-    
-    beepIntervalId = setInterval(() => {
-        console.log(`Intervalo ejecutándose - Beep count: ${beepCount}`);
+
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.value = 800;
+                oscillator.type = 'square';
+
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.1);
+                gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.6);
+
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.6);
+
+                console.log(` Beep #${beepCount} reproducido`);
+
+                setTimeout(() => {
+                    if (audioContext.state !== 'closed') {
+                        audioContext.close();
+                    }
+                }, 700);
+
+            } catch (error) {
+                console.error(`Error en beep #${beepCount}:`, error);
+            }
+        };
+
+        
         createBeepWithNewContext();
-    }, 1200);
-    
-    console.log(`✅ Intervalo creado con ID: ${beepIntervalId}`);
-    
-    
-    const protectedStop = (source = 'unknown') => {
-        console.log(` Intento de stop desde: ${source}`);
-        console.trace('Stack trace:');
+
+        // Intervalo de beeps
+        beepIntervalId = setInterval(() => {
+            console.log(` Intervalo ejecutándose - Beep count: ${beepCount}`);
+            createBeepWithNewContext();
+        }, 1200);
+
+        console.log(` Intervalo creado con ID: ${beepIntervalId}`);
+
+        const protectedStop = (source = 'unknown') => {
+            console.log(`Intento de stop desde: ${source}`);
+
+            // Solo permitir si ya empezó y se presiona desde el botón de SweetAlert
+            if (!alarmStarted) {
+                console.log(' Stop rechazado - Alarma aún no ha comenzado completamente');
+                return;
+            }
+
+            console.log('Stop autorizado - Deteniendo alarma');
+            isActive = false;
+            if (beepIntervalId) {
+                clearInterval(beepIntervalId);
+                beepIntervalId = null;
+            }
+            console.log(` Alarma detenida después de ${beepCount} beeps`);
+        };
+
+        audioRef.current = { stopBeeps: () => protectedStop('SweetAlert button') };
+
+        // Espera breve antes de permitir detener
+        setTimeout(() => {
+            alarmStarted = true;
+            console.log(' Alarma oficialmente iniciada - Stop permitido');
+        }, 500);
+
         
-        // SOLO permitir stop si la alarma realmente comenzó Y han pasado al menos 2 segundos
-        if (!alarmStarted) {
-            console.log(' Stop rechazado - Alarma aún no ha comenzado completamente');
-            return;
-        }
-        
-        if (beepCount < 10 && source !== 'SweetAlert button') {
-            console.log(` Stop rechazado - Solo ${beepCount}/10 beeps, esperando más beeps (fuente: ${source})`);
-            return;
-        }
-        
-        console.log('Stop autorizado - Deteniendo alarma');
-        isActive = false;
-        if (beepIntervalId) {
-            clearInterval(beepIntervalId);
-            beepIntervalId = null;
-        }
-        console.log(`Alarma detenida después de ${beepCount} beeps`);
-    };
-    
-    
-    const originalAudioRef = audioRef.current;
-    audioRef.current = { 
-        stopBeeps: () => protectedStop('audioRef.stopBeeps'),
-        originalStop: originalAudioRef // Backup por si acaso
-    };
-    
-    y
-    setTimeout(() => {
-        alarmStarted = true;
-        console.log('Alarma oficialmente iniciada - Stop ahora permitido');
-    }, 500);
-    
-    
-    Swal.fire({
-        title: "¡Tiempo cumplido!",
-        text: "El cronómetro ha finalizado",
-        icon: "success",
-        confirmButtonText: "Parar alarma",
-        confirmButtonColor: "#393E46",
-        background: "#EEEEEE",
-        color: "black",
-        customClass: { popup: 'custom-swal' },
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => {
-            console.log(' SweetAlert abierto');
+        Swal.fire({
+            title: "¡Tiempo cumplido!",
+            text: "El cronómetro ha finalizado",
+            icon: "success",
+            confirmButtonText: "Parar alarma",
+            confirmButtonColor: "#393E46",
+            background: "#EEEEEE",
+            color: "black",
+            customClass: { popup: 'custom-swal' },
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                console.log(' SweetAlert abierto');
             }
         }).then(() => {
-            console.log('Usuario presionó botón SweetAlert');
+            console.log(' Usuario presionó botón SweetAlert');
             protectedStop('SweetAlert button');
         });
     };
