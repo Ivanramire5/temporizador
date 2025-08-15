@@ -16,7 +16,7 @@ const firebaseConfig = {
     databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL, 
 };
 
-// Inicializamos la app
+
 const app = initializeApp(firebaseConfig);
 
 // Inicializamos los servicios

@@ -6,7 +6,7 @@ import TimerDisplay from "../components/TimerDisplay";
 import "../styles/home.css";
 
 export default function HomeScreen() {
-  const { codigo } = useParams(); // Cambiado de 'sala' a 'codigo'
+    const { codigo } = useParams(); 
     const navigate = useNavigate();
     const [timeLeft, setTimeLeft] = useState(0);
     const timeoutIdRef = useRef(null);
@@ -61,7 +61,7 @@ export default function HomeScreen() {
         <div className="pageHome">
         <h1 className="h1Home">Temporizador</h1>
         <TimerDisplay codigo={codigo} />
-        <p>Tiempo restante: {timeLeft > 0 ? `${timeLeft}s` : "Sin iniciar"}</p>
+        <p class="homeP">Tiempo restante: {timeLeft > 0 ? `${timeLeft}s` : "Sin iniciar"}</p>
         </div>
     );
 }
